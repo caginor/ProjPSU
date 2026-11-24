@@ -13,7 +13,6 @@ import pygame
 
 from Settings.Settings import settings
 
-
 class Player:
     def __init__(self, x: float = 1.5, y: float = 1.5, angle: float = 0.0) -> None:
         self.x = x
