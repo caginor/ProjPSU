@@ -14,6 +14,7 @@
 """
 import json
 from dataclasses import asdict, dataclass, field
+import math
 
 import pygame
 
@@ -45,6 +46,40 @@ class ViewDistance:
 @dataclass
 class Raycasting:
     Walls_height: int = 1000
+    Fov: float = math.pi / 3                 # угол обзора
+    Ray_width: int = 3                       # ширина колонки в пикселях (1920 / 3 = 640 лучей)
+    Sprite_scale: float = 0.3                # размер предметов относительно стены
+    Half_fov: float = field(init=False)
+    Num_rays: int = field(init=False, default=0)         # считает Settings.__post_init__ (нужна ширина экрана)
+    Delta_angle: float = field(init=False, default=0.0)  # считает Settings.__post_init__
+
+    def __post_init__(self) -> None:
+        self.Half_fov = self.Fov / 2
+
+
+# --- [Человек 1] игрок и текстуры ---
+@dataclass
+class PlayerSettings:
+    Speed: float = 3.0                       # клеток в секунду
+    Rot_speed: float = 2.2                   # радиан в секунду
+    Radius: float = 0.2                      # радиус хитбокса
+
+
+@dataclass
+class Textures:
+    """Имена - контракт между рендером и остальными: стены берутся по Models.Tiles.TILE_TEXTURES,
+    предметы - по id из карты. 'key' - одна картинка, из неё красятся ключи из Keys.Names.
+    Нет файла - рисуется цветная заглушка (см. Assets/AssetLoader.py)."""
+
+    Paths: dict = field(
+        default_factory=lambda: {
+            "wall": "textures/wall.png",                # стена
+            "door_red": "textures/door_red.png",        # красная дверь
+            "door_blue": "textures/door_blue.png",      # синяя дверь
+            "exit": "textures/exit.png",                # выход на улицу
+            "stairs": "textures/stairs.png",            # лестница (вниз и вверх)
+        }
+    )
 
 
 @dataclass
