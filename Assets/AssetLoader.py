@@ -34,6 +34,12 @@ class AssetLoader:
                 pygame.draw.line(surface, dark, (0, line), (63, line))
             return surface
 
+        if name == "door_anim":                                   # дверь анимации: коричневая с рамкой
+            surface = pygame.Surface(size or settings.door.Animation_size)
+            surface.fill((90, 50, 25))
+            pygame.draw.rect(surface, (40, 20, 10), surface.get_rect(), 6)
+            return surface
+
     @staticmethod
     def load_image(
         path: str, name: str, size: tuple[int, int] | None = None, alpha: bool = False
@@ -56,6 +62,9 @@ class AssetLoader:
         assets: dict[str, pygame.Surface] = {}
 
         for name, path in textures.Paths.items():
-            assets[name] = cls.load_image(path, name)
+            if name == "door_anim":
+                assets[name] = cls.load_image(path, name, settings.door.Animation_size)
+            else:
+                assets[name] = cls.load_image(path, name)
 
         return assets

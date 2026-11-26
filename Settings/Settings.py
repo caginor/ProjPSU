@@ -147,7 +147,15 @@ class Settings:
     title: Title = field(default_factory=Title)
     door: Door = field(default_factory=Door)
     clip: Clip = field(default_factory=Clip)
+    player: PlayerSettings = field(default_factory=PlayerSettings)   # [Человек 1]
+    textures: Textures = field(default_factory=Textures)             # [Человек 1]
+    world: WorldSettings = field(default_factory=WorldSettings)      # [Человек 2]
 
+    def __post_init__(self) -> None:
+        """Производные величины, которым нужны сразу две секции конфига."""
+        rays = self.raycasting
+        rays.Num_rays = self.screen.Width // rays.Ray_width
+        rays.Delta_angle = rays.Fov / rays.Num_rays
 
 settings = Settings()
 

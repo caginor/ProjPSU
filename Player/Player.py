@@ -1,9 +1,11 @@
-"""Состояние игрока, которое читает интерфейс.
+"""Игрок: позиция, движение с коллизиями и поля, которые читает интерфейс.
 
-Движение/поворот/коллизии - часть человека 1, и он же решит, в каком модуле жить
-Player'у. Здесь только те поля, без которых не запустится HUD: инвентарь, ключи,
-наличие противогаза. Как только человек 1 перенесёт своего Player'а сюда, эти три поля
-остаться должны как есть - на них завязан InventoryHandler.
+Три поля (inventory, keys, has_mask) на месте: на них завязан InventoryHandler и HUD.
+Скорость, поворот и радиус хитбокса берутся из settings.player. Карта нужна только
+методом is_blocked(x, y) (см. Map/GameMap.py).
+
+Управление: W/S или стрелки вверх/вниз - вперёд/назад, A/D - шаг вбок,
+стрелки влево/вправо (и Q) - поворот. E свободна для дверей.
 """
 import math
 
@@ -21,6 +23,16 @@ class Player:
         self.has_mask: bool = False
 
     # TODO(человек 1): update/rotate/move и коллизии - поверх этих полей.
+
+    @property
+    def pose(self) -> tuple[float, float, float]:
+        return self.x, self.y, self.angle
+
+    def set_pose(self, x: float, y: float, angle: float | None = None) -> None:
+        """Поставить игрока; angle=None - не трогать направление взгляда."""
+        self.x, self.y = x, y
+        if angle is not None:
+            self.angle = angle
 
     def reset(self) -> None:
         """Состояние на новый заход, иначе инвентарь течёт между партиями."""
