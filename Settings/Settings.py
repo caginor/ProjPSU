@@ -56,14 +56,11 @@ class Raycasting:
     def __post_init__(self) -> None:
         self.Half_fov = self.Fov / 2
 
-
-# --- [Человек 1] игрок и текстуры ---
 @dataclass
 class PlayerSettings:
     Speed: float = 3.0                       # клеток в секунду
     Rot_speed: float = 2.2                   # радиан в секунду
     Radius: float = 0.2                      # радиус хитбокса
-
 
 @dataclass
 class Textures:
@@ -78,9 +75,12 @@ class Textures:
             "door_blue": "textures/door_blue.png",      # синяя дверь
             "exit": "textures/exit.png",                # выход на улицу
             "stairs": "textures/stairs.png",            # лестница (вниз и вверх)
+            "coal": "textures/coal.png",
+            "gauze": "textures/gauze.png",
+            "bottle": "textures/bottle.png",
         }
     )
-
+    Item_size: tuple = (64, 64)
 
 @dataclass
 class Items:
@@ -92,7 +92,6 @@ class Items:
         }
     )
 
-
 @dataclass
 class Keys:
     Names: dict = field(
@@ -101,7 +100,6 @@ class Keys:
             "key_blue": ("Синий ключ", (90, 140, 255)),
         }
     )
-
 
 @dataclass
 class Title:
@@ -121,20 +119,17 @@ class Title:
     )
     Hold_time: float = 5.0
 
-
 @dataclass
 class Door:
     Animation_size: tuple = (420, 520)
     Opening_time: float = 0.8
     Fade_time: float = 0.4
 
-
 @dataclass
 class Clip:
     """Видеопролог. Файла нет или moviepy не стоит - интро пропускается, игра стартует."""
 
     Path: str = "intro/video.mp4"
-
 
 @dataclass
 class Settings:
@@ -159,13 +154,11 @@ class Settings:
 
 settings = Settings()
 
-
 def dump(path: str = "settings.json") -> str:
     """Отладочный дамп конфига. Вызывается вручную, приложению не нужен."""
     with open(path, "w", encoding="utf-8") as file:
         json.dump(asdict(settings), file, indent=2, ensure_ascii=False)
     return path
-
 
 if __name__ == "__main__":
     print(f"конфиг выписан в {dump()}")

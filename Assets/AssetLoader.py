@@ -18,7 +18,12 @@ WALL_COLORS = {
     "exit": (70, 200, 90),
     "stairs": (225, 185, 55),
 }
-
+ITEM_COLORS = {
+    "coal": (60, 60, 65),
+    "gauze": (240, 240, 245),
+    "bottle": (90, 210, 220),
+    "key": (255, 255, 255),
+}
 
 class AssetLoader:
     @staticmethod
@@ -39,6 +44,14 @@ class AssetLoader:
             surface.fill((90, 50, 25))
             pygame.draw.rect(surface, (40, 20, 10), surface.get_rect(), 6)
             return surface
+
+        size = size or settings.textures.Item_size  # предмет: круг на прозрачном фоне
+        surface = pygame.Surface(size, pygame.SRCALPHA)
+        center = (size[0] // 2, size[1] // 2)
+        radius = max(4, size[0] // 2 - 4)
+        pygame.draw.circle(surface, ITEM_COLORS.get(name, (255, 220, 60)), center, radius)
+        pygame.draw.circle(surface, (255, 255, 255), center, radius, 2)
+        return surface
 
     @staticmethod
     def load_image(
@@ -62,9 +75,16 @@ class AssetLoader:
         assets: dict[str, pygame.Surface] = {}
 
         for name, path in textures.Paths.items():
-            if name == "door_anim":
+            if name in sprite_kinds or name == "key":
+                assets[name] = cls.load_image(path, name, textures.Item_size, alpha=True)
+            elif name == "door_anim":
                 assets[name] = cls.load_image(path, name, settings.door.Animation_size)
             else:
                 assets[name] = cls.load_image(path, name)
+
+        for kind, (_, color) in settings.keys.Names.items():
+            tinted = assets["key"].copy()
+            tinted.fill((*color, 255), special_flags=pygame.BLEND_RGBA_MULT)
+            assets[kind] = tinted
 
         return assets

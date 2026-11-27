@@ -6,6 +6,7 @@
 import pygame
 
 from Raycasting.RayCaster import RayCaster
+from Raycasting.SpriteDrawer import SpriteDrawer
 from UI.Backgrounds import create_background, create_vignette
 
 
