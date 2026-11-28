@@ -23,6 +23,7 @@ MODULES = [
     "Models.Display",
     "Models.ParametrizedLine",
     "Models.Text",
+    "Models.Tiles",
     "Settings.Settings",
     "Player.Player",
     "InventoryHandler.InventoryHandler",
@@ -34,6 +35,13 @@ MODULES = [
     "UI.ScreenWriter",
     "Intro.IntroPlayer",
     "GameManager.GameManager",
+    "Assets.AssetLoader",
+    "Raycasting.RayCaster",
+    "Raycasting.SpriteDrawer",
+    "Raycasting.Scene",
+    "GameManager.game",
+    "map",
+    "main",
 ]
 
 

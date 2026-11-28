@@ -1,12 +1,16 @@
 """Загрузка картинок. Вызывать ПОСЛЕ pygame.display.set_mode(): без окна convert() падает.
 
 Результат - один словарь {имя: Surface}, его читают все:
-  * рендер: стены по Models.Tiles.TILE_TEXTURES (wall, door_red, door_blue, exit, stairs);
+  * рендер: стены по Models.Tiles.TILE_TEXTURES (wall, door_red, door_blue, exit, stairs),
+            предметы по id из карты (coal, gauze, bottle, key_red, key_blue);
+  * HUD (человек 3): InventoryHandler.initialize(assets) берёт оттуда иконки слотов;
+  * Door (человек 3): assets["door_anim"].
 
 Нет файла - вместо картинки цветная заглушка (цвета те же, что были у стен и предметов
 до текстур), а в лог пишется строка. Игра запускается и без единой текстуры.
 """
 import pygame
+from pathlib import Path
 
 from Logging.Logger import Logger
 from Settings.Settings import settings
@@ -22,8 +26,9 @@ ITEM_COLORS = {
     "coal": (60, 60, 65),
     "gauze": (240, 240, 245),
     "bottle": (90, 210, 220),
-    "key": (255, 255, 255),
+    "key": (255, 255, 255),       # белая основа: окрашивается в цвет ключа
 }
+
 
 class AssetLoader:
     @staticmethod
@@ -45,7 +50,7 @@ class AssetLoader:
             pygame.draw.rect(surface, (40, 20, 10), surface.get_rect(), 6)
             return surface
 
-        size = size or settings.textures.Item_size  # предмет: круг на прозрачном фоне
+        size = size or settings.textures.Item_size                # предмет: круг на прозрачном фоне
         surface = pygame.Surface(size, pygame.SRCALPHA)
         center = (size[0] // 2, size[1] // 2)
         radius = max(4, size[0] // 2 - 4)
@@ -58,7 +63,7 @@ class AssetLoader:
         path: str, name: str, size: tuple[int, int] | None = None, alpha: bool = False
     ) -> pygame.Surface:
         try:
-            image = pygame.image.load(path)
+            image = pygame.image.load(str(Path(__file__).resolve().parent.parent / path))
         except (FileNotFoundError, pygame.error) as exc:
             Logger.error(f"AssetLoader: can't load {path}: {exc}")
             image = AssetLoader.make_fallback(name, size)
@@ -72,6 +77,7 @@ class AssetLoader:
     @classmethod
     def load_assets(cls) -> dict[str, pygame.Surface]:
         textures = settings.textures
+        sprite_kinds = set(settings.items.Names)
         assets: dict[str, pygame.Surface] = {}
 
         for name, path in textures.Paths.items():
@@ -79,9 +85,10 @@ class AssetLoader:
                 assets[name] = cls.load_image(path, name, textures.Item_size, alpha=True)
             elif name == "door_anim":
                 assets[name] = cls.load_image(path, name, settings.door.Animation_size)
-            else:
+            else:                                                 # стены, двери, лестница, выход
                 assets[name] = cls.load_image(path, name)
 
+        # Цветные ключи: одна картинка, окрашенная в цвета из Keys.Names
         for kind, (_, color) in settings.keys.Names.items():
             tinted = assets["key"].copy()
             tinted.fill((*color, 255), special_flags=pygame.BLEND_RGBA_MULT)
